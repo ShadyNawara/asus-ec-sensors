@@ -56,7 +56,7 @@ static char *mutex_path_override;
 
 #define ASUS_HW_ACCESS_MUTEX_RMTW_ASMX	"\\RMTW.ASMX"
 
-#define MAX_IDENTICAL_BOARD_VARIATIONS	2
+#define MAX_IDENTICAL_BOARD_VARIATIONS	3
 
 /* Moniker for the ACPI global lock (':' is not allowed in ASL identifiers) */
 #define ACPI_GLOBAL_LOCK_PSEUDO_PATH	":GLOBAL_LOCK"
@@ -267,16 +267,8 @@ static const struct ec_board_info board_info[] = {
 		.family = family_amd_500_series,
 	},
 	{
-		.board_names = {"ROG CROSSHAIR VIII FORMULA"},
-		.sensors = SENSOR_SET_TEMP_CHIPSET_CPU_MB |
-			SENSOR_TEMP_T_SENSOR | SENSOR_TEMP_VRM |
-			SENSOR_FAN_CPU_OPT | SENSOR_FAN_CHIPSET |
-			SENSOR_CURR_CPU | SENSOR_IN_CPU_CORE,
-		.mutex_path = ASUS_HW_ACCESS_MUTEX_ASMX,
-		.family = family_amd_500_series,
-	},
-	{
 		.board_names = {
+			"ROG CROSSHAIR VIII FORMULA"
 			"ROG CROSSHAIR VIII HERO",
 			"ROG CROSSHAIR VIII HERO (WI-FI)",
 		},
@@ -320,6 +312,14 @@ static const struct ec_board_info board_info[] = {
 		.sensors = SENSOR_SET_TEMP_CHIPSET_CPU_MB |
 			SENSOR_TEMP_T_SENSOR | SENSOR_TEMP_VRM |
 			SENSOR_FAN_CHIPSET | SENSOR_CURR_CPU |
+			SENSOR_IN_CPU_CORE,
+		.mutex_path = ASUS_HW_ACCESS_MUTEX_ASMX,
+		.family = family_amd_500_series,
+	},
+	{
+		.board_names = {"ROG STRIX X570-E GAMING WIFI II"},
+		.sensors = SENSOR_SET_TEMP_CHIPSET_CPU_MB |
+			SENSOR_TEMP_T_SENSOR | SENSOR_CURR_CPU |
 			SENSOR_IN_CPU_CORE,
 		.mutex_path = ASUS_HW_ACCESS_MUTEX_ASMX,
 		.family = family_amd_500_series,
