@@ -19,6 +19,9 @@
  * - Water Flow fan RPM
  * - CPU current
  * - CPU core voltage
+ * - VRM Current
+ * - VRM Power
+ * - IVR TX VDDQ
  */
 
 #include <linux/acpi.h>
@@ -81,6 +84,7 @@ static u32 hwmon_attributes[hwmon_max] = {
 	[hwmon_in] = HWMON_I_INPUT | HWMON_I_LABEL,
 	[hwmon_curr] = HWMON_C_INPUT | HWMON_C_LABEL,
 	[hwmon_fan] = HWMON_F_INPUT | HWMON_F_LABEL,
+	[hwmon_power] = HWMON_P_INPUT | HWMON_P_LABEL,
 };
 
 struct ec_sensor_info {
@@ -121,6 +125,12 @@ enum ec_sensors {
 	ec_sensor_temp_water_in,
 	/* "Water_Out" temperature sensor reading [℃] */
 	ec_sensor_temp_water_out,
+	/* IVR TX VDDQ sensor reading [V] */
+	ec_sensor_in_ivr_tx_vddq,
+	/* VRM Vcore Current [A] */
+	ec_sensor_curr_vrm_vcore,
+	/* VRM Vcore Power [W] */
+	ec_sensor_power_vrm_vcore,
 };
 
 #define SENSOR_TEMP_CHIPSET BIT(ec_sensor_temp_chipset)
@@ -136,6 +146,9 @@ enum ec_sensors {
 #define SENSOR_CURR_CPU BIT(ec_sensor_curr_cpu)
 #define SENSOR_TEMP_WATER_IN BIT(ec_sensor_temp_water_in)
 #define SENSOR_TEMP_WATER_OUT BIT(ec_sensor_temp_water_out)
+#define SENSOR_IN_IVR_TX_VDDQ BIT(ec_sensor_in_ivr_tx_vddq)
+#define SENSOR_CURR_VRM_VCORE BIT(ec_sensor_curr_vrm_vcore)
+#define SENSOR_POWER_VRM_VCORE BIT(ec_sensor_power_vrm_vcore)
 
 enum board_family {
 	family_unknown,
@@ -200,10 +213,14 @@ static const struct ec_sensor_info sensors_family_amd_500[] = {
 		EC_SENSOR("Water_Out", hwmon_temp, 1, 0x01, 0x01),
 };
 
+#define testing_number 0x52
+
 static const struct ec_sensor_info sensors_family_intel_600[] = {
-	[ec_sensor_temp_t_sensor] =
-		EC_SENSOR("T_Sensor", hwmon_temp, 1, 0x00, 0x3d),
+	[ec_sensor_temp_t_sensor] = EC_SENSOR("T_Sensor", hwmon_temp, 1, 0x00, 0x3d),
 	[ec_sensor_temp_vrm] = EC_SENSOR("VRM", hwmon_temp, 1, 0x00, 0x3e),
+	[ec_sensor_in_ivr_tx_vddq] = EC_SENSOR("IVR TX VDDQ", hwmon_in, 2, 0x00, 0xd6),
+	[ec_sensor_curr_vrm_vcore] = EC_SENSOR("VRM Vcore", hwmon_curr, 2, 0x00, 0x52),
+	[ec_sensor_power_vrm_vcore] = EC_SENSOR("VRM Vcore", hwmon_power, 2, 0x00, 0x64),
 };
 
 /* Shortcuts for common combinations */
@@ -341,7 +358,9 @@ static const struct ec_board_info board_info[] = {
 	},
 	{
 		.board_names = {"ROG STRIX Z690-A GAMING WIFI D4"},
-		.sensors = SENSOR_TEMP_T_SENSOR | SENSOR_TEMP_VRM,
+		.sensors = SENSOR_TEMP_T_SENSOR | SENSOR_TEMP_VRM |
+		SENSOR_IN_IVR_TX_VDDQ | SENSOR_CURR_VRM_VCORE |
+		SENSOR_POWER_VRM_VCORE,
 		.mutex_path = ASUS_HW_ACCESS_MUTEX_RMTW_ASMX,
 		.family = family_intel_600_series,
 	},
